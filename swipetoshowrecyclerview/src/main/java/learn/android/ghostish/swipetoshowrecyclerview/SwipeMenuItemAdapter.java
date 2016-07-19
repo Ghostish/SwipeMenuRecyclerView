@@ -47,15 +47,21 @@ public abstract class SwipeMenuItemAdapter<VH extends RecyclerView.ViewHolder> e
         }
     }
 
+    /*you must return your itemview according to the given viewtype in this method*/
     public abstract View onPrepareViewHolder(ViewGroup parent, int viewType);
 
+    /*return the viewholder created for your itemview, usually just simply return your viewHolder instance*/
     public abstract VH onCreateViewHolder(View container);
 
-    public void onButtonSheetItemClick(RecyclerView.ViewHolder holder, int labelPosition, String labels) {
+    /*return the MenuItemBean array which describe your menu according to the given viewtype.
+    * Each MenuItemBean have a label and a color related to each menu item
+    */
+    public abstract MenuItemBean[] getMenuContent(int viewType);
+
+    /*handle menu items' onClick event here*/
+    public void onMenuItemClick(RecyclerView.ViewHolder holder, int labelPosition, String labels) {
         holder.itemView.scrollTo(0, 0);
     }
-
-    public abstract MenuItemBean[] getMenuContent(int viewType);
 
     public SwipeMenuItemAdapter(Context mContext, RecyclerView recyclerView) {
         this.mContext = mContext;
@@ -99,7 +105,7 @@ public abstract class SwipeMenuItemAdapter<VH extends RecyclerView.ViewHolder> e
                 @Override
                 public void onClick(View v) {
                     RecyclerView.ViewHolder vh = mRecyclerView.getChildViewHolder(container);
-                    onButtonSheetItemClick(vh, finalI, bean.getLabel());
+                    onMenuItemClick(vh, finalI, bean.getLabel());
                 }
             });
 

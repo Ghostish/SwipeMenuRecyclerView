@@ -13,7 +13,7 @@ ext {
     siteUrl = 'https://github.com/Ghostish/SwipeToShowRecyclerView'
     gitUrl = 'https://github.com/Ghostish/SwipeToShowRecyclerView.git'
 
-    libraryVersion = '1.0.0'
+    libraryVersion = '1.0.1'
 
     developerId = 'ghostish'
     developerName = 'Kangel Zenn'

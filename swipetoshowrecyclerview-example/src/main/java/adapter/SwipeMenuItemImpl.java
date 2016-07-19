@@ -29,15 +29,14 @@ public class SwipeMenuItemImpl extends SwipeMenuItemAdapter<SwipeMenuItemImpl.Vi
         return LayoutInflater.from(parent.getContext()).inflate(R.layout.swipe_item_layout, parent, false);
 
     }
-
     @Override
     public ViewHolder onCreateViewHolder(View container) {
         return new ViewHolder(container);
     }
 
     @Override
-    public void onButtonSheetItemClick(RecyclerView.ViewHolder viewHolder, int labelPosition, String labels) {
-        super.onButtonSheetItemClick(viewHolder, labelPosition, labels);
+    public void onMenuItemClick(RecyclerView.ViewHolder viewHolder, int labelPosition, String labels) {
+        super.onMenuItemClick(viewHolder, labelPosition, labels);
         switch (labels) {
             case "Top": {
                 Bean bean = mData.remove(viewHolder.getAdapterPosition());
