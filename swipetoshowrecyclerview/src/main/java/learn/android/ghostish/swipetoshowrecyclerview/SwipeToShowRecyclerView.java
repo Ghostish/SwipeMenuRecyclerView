@@ -23,7 +23,7 @@ public class SwipeToShowRecyclerView extends RecyclerView {
     private int MAX_LENGTH = 0;
     private int MAX_EXTEND = 0;
     private int ITEM_OVER_SCROLL_LENGTH = 50;
-    private View lastTouchView;  /*最近一次Action_Down事件中触摸到的view*/
+    private View lastTouchView;  /*the last view set in the latest ACTION_DOWN event*/
     private int mLastAction;
     private ViewConfiguration mViewConfiguration = ViewConfiguration.get(getContext());
     private boolean isItemDragging = false;
@@ -88,19 +88,6 @@ public class SwipeToShowRecyclerView extends RecyclerView {
     }
 
     @Override
-    public void onWindowFocusChanged(boolean hasWindowFocus) {
-        super.onWindowFocusChanged(hasWindowFocus);
-        if (hasWindowFocus) {
-            Adapter adapter = getAdapter();
-            if (adapter instanceof SwipeItemAdapter) {
-                SwipeItemAdapter swipeItemAdapter = (SwipeItemAdapter) adapter;
-                MAX_LENGTH = swipeItemAdapter.getButtonSheetWidth();
-                MAX_EXTEND = MAX_LENGTH + ITEM_OVER_SCROLL_LENGTH;
-            }
-        }
-    }
-
-    @Override
     public boolean onTouchEvent(MotionEvent e) {
         if (isItemDragging) {
             Log.d("ACTION", "touch consumed");
@@ -136,12 +123,14 @@ public class SwipeToShowRecyclerView extends RecyclerView {
                     }
                 }
                 lastTouchView = getChildAtPoint(x, y);
-                Log.d("ACTION_VIEW", "lastTouchView is null ? " + (lastTouchView == null));
                 break;
             case MotionEvent.ACTION_MOVE:
                 Log.d("ACTION", "MOVE");
 
                 if (lastTouchView != null) {
+                    SwipeMenuItemAdapter adapter = (SwipeMenuItemAdapter) getAdapter();
+                    MAX_LENGTH = adapter.getMenuWidth(getChildViewHolder(lastTouchView).getItemViewType());
+                    MAX_EXTEND = MAX_LENGTH + ITEM_OVER_SCROLL_LENGTH;
                     int newScrollDistance = mLastX - x;
                     int scrollX = lastTouchView.getScrollX();
                     if (scrollX <= -ITEM_OVER_SCROLL_LENGTH && newScrollDistance < 0) {
@@ -166,6 +155,9 @@ public class SwipeToShowRecyclerView extends RecyclerView {
                 Log.d("ACTION", "DOWN");
 
                 if (lastTouchView != null && !isViewAnimating && isItemDragging) {
+                    SwipeMenuItemAdapter adapter = (SwipeMenuItemAdapter) getAdapter();
+                    MAX_LENGTH = adapter.getMenuWidth(getChildViewHolder(lastTouchView).getItemViewType());
+                    MAX_EXTEND = MAX_LENGTH + ITEM_OVER_SCROLL_LENGTH;
                     int scrollX = lastTouchView.getScrollX();
                     final View v = lastTouchView;
                     if (scrollX >= MAX_LENGTH / 4) {

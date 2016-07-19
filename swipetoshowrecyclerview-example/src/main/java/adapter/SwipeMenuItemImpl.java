@@ -1,6 +1,7 @@
 package adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +11,7 @@ import android.widget.Toast;
 
 import java.util.List;
 
-import learn.android.ghostish.swipetoshowrecyclerview.SwipeItemAdapter;
+import learn.android.ghostish.swipetoshowrecyclerview.SwipeMenuItemAdapter;
 import learn.android.ghostish.swipetoshowrecyclerviewdemo.R;
 
 
@@ -18,9 +19,11 @@ import learn.android.ghostish.swipetoshowrecyclerviewdemo.R;
  * Created by Kangel on 2016/7/15.
  */
 
-public class SwipeItemImpl extends SwipeItemAdapter<SwipeItemImpl.ViewHolder> {
+public class SwipeMenuItemImpl extends SwipeMenuItemAdapter<SwipeMenuItemImpl.ViewHolder> {
     private List<Bean> mData;
-
+    private static final int TYPE_TOP = 11;
+    private static final int TYPE_NO_DELETE = 12;
+    private static final int TYPE_NORMAL = 13;
     @Override
     public View onPrepareViewHolder(ViewGroup parent, int viewType) {
         return LayoutInflater.from(parent.getContext()).inflate(R.layout.swipe_item_layout, parent, false);
@@ -35,30 +38,57 @@ public class SwipeItemImpl extends SwipeItemAdapter<SwipeItemImpl.ViewHolder> {
     @Override
     public void onButtonSheetItemClick(RecyclerView.ViewHolder viewHolder, int labelPosition, String labels) {
         super.onButtonSheetItemClick(viewHolder, labelPosition, labels);
-        switch (labelPosition) {
-            case 0: {
+        switch (labels) {
+            case "Top": {
                 Bean bean = mData.remove(viewHolder.getAdapterPosition());
                 mData.add(0, bean);
                 notifyItemRangeChanged(0, mData.size());
                 break;
             }
-            case 1: {
+            case "Mark as Unread": {
                 Bean bean = mData.get(viewHolder.getAdapterPosition());
                 bean.setRead(false);
                 notifyItemChanged(viewHolder.getAdapterPosition());
                 break;
             }
 
-            case 2:
+            case "Delete":
                 mData.remove(viewHolder.getAdapterPosition());
                 notifyItemRemoved(viewHolder.getAdapterPosition());
                 break;
         }
     }
 
+    @Override
+    public SwipeMenuItemAdapter.MenuItemBean[] getMenuContent(int viewType) {
+        MenuItemBean[] beans = null;
+        switch (viewType) {
+            case TYPE_TOP:
+                beans = new MenuItemBean[]{new MenuItemBean("Mark as Unread", Color.parseColor("#FFB7B2B4")), new MenuItemBean("Delete", Color.RED)};
+                break;
+            case TYPE_NORMAL:
+                beans = new MenuItemBean[]{new MenuItemBean("Top", Color.parseColor("#FFFF8C40")), new MenuItemBean("Mark as Unread", Color.parseColor("#FFB7B2B4")), new MenuItemBean("Delete", Color.RED)};
+                break;
+            case TYPE_NO_DELETE:
+                beans = new MenuItemBean[]{new MenuItemBean("Top", Color.parseColor("#FFFF8C40")), new MenuItemBean("Mark as Unread", Color.parseColor("#FFB7B2B4"))};
+                break;
+        }
+        return beans;
+    }
 
-    public SwipeItemImpl(Context mContext, RecyclerView recyclerView, List<Bean> mData, int[] colors, String[] labels) {
-        super(mContext, recyclerView, colors, labels);
+    @Override
+    public int getItemViewType(int position) {
+        if (position == 0) {
+            return TYPE_TOP;
+        }
+        if (position < mData.size() / 2) {
+            return TYPE_NO_DELETE;
+        }
+        return TYPE_NORMAL;
+    }
+
+    public SwipeMenuItemImpl(Context mContext, RecyclerView recyclerView, List<Bean> mData) {
+        super(mContext, recyclerView);
         this.mData = mData;
     }
 

@@ -2,9 +2,9 @@ package learn.android.ghostish.swipetoshowrecyclerview;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.annotation.ColorInt;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.SparseIntArray;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -16,12 +16,36 @@ import android.widget.TextView;
  * Created by Kangel on 2016/7/15.
  */
 
-public abstract class SwipeItemAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
-    private int mButtonSheetWidth = 0;
+public abstract class SwipeMenuItemAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
+    private SparseIntArray mMenuWidths = new SparseIntArray();
     private Context mContext;
-    private int[] mColors;
-    private String[] mLabels;
     private RecyclerView mRecyclerView;
+
+    public static class MenuItemBean {
+        String label;
+        int color;
+
+        public MenuItemBean(String label, int color) {
+            this.label = label;
+            this.color = color;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public void setLabel(String label) {
+            this.label = label;
+        }
+
+        public int getColor() {
+            return color;
+        }
+
+        public void setColor(int color) {
+            this.color = color;
+        }
+    }
 
     public abstract View onPrepareViewHolder(ViewGroup parent, int viewType);
 
@@ -31,26 +55,23 @@ public abstract class SwipeItemAdapter<VH extends RecyclerView.ViewHolder> exten
         holder.itemView.scrollTo(0, 0);
     }
 
-    public SwipeItemAdapter(Context mContext, RecyclerView recyclerView, int[] mColors, String[] mLabels) {
+    public abstract MenuItemBean[] getMenuContent(int viewType);
+
+    public SwipeMenuItemAdapter(Context mContext, RecyclerView recyclerView) {
         this.mContext = mContext;
         this.mRecyclerView = recyclerView;
-        this.mColors = mColors;
-        this.mLabels = mLabels;
     }
 
-
-    public int getButtonSheetWidth() {
-        return mButtonSheetWidth;
+    public int getMenuWidth(int viewType) {
+        return mMenuWidths.get(viewType);
     }
 
     public Context getContext() {
         return mContext;
     }
 
-    public ViewGroup wrapItemView(View itemView, String[] labels, @ColorInt int[] colors) {
-        if (colors.length != labels.length) {
-            throw new IllegalArgumentException("labels array'size should equal to color array's size");
-        }
+    public ViewGroup wrapItemView(View itemView, int viewType) {
+        MenuItemBean[] menuItems = getMenuContent(viewType);
         int paddingSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, mContext.getResources().getDisplayMetrics());
 
         final LinearLayout container = new LinearLayout(mContext);
@@ -58,16 +79,17 @@ public abstract class SwipeItemAdapter<VH extends RecyclerView.ViewHolder> exten
         RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         container.setLayoutParams(lp);
         container.addView(itemView);
-        mButtonSheetWidth = 0;
-        for (int i = 0; i < labels.length; i++) {
+        int menuWidith = 0;
+        for (int i = 0; i < menuItems.length; i++) {
+            final MenuItemBean bean = menuItems[i];
             final TextView text = new TextView(mContext);
             text.setTextSize(16);
             text.setPadding(paddingSize, paddingSize, paddingSize, paddingSize);
             text.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             text.setGravity(Gravity.CENTER);
-            text.setText(labels[i]);
+            text.setText(bean.getLabel());
             text.setTextColor(Color.WHITE);
-            text.setBackgroundColor(colors[i]);
+            text.setBackgroundColor(bean.getColor());
             text.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
             int textWidth = text.getMeasuredWidth();
             text.setLayoutParams(new LinearLayout.LayoutParams(textWidth, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -77,13 +99,13 @@ public abstract class SwipeItemAdapter<VH extends RecyclerView.ViewHolder> exten
                 @Override
                 public void onClick(View v) {
                     RecyclerView.ViewHolder vh = mRecyclerView.getChildViewHolder(container);
-                    onButtonSheetItemClick(vh, finalI, mLabels[finalI]);
+                    onButtonSheetItemClick(vh, finalI, bean.getLabel());
                 }
             });
 
             container.addView(text);
-            mButtonSheetWidth += textWidth;
-
+            menuWidith += textWidth;
+            mMenuWidths.put(viewType, menuWidith);
         }
         return container;
     }
@@ -100,7 +122,7 @@ public abstract class SwipeItemAdapter<VH extends RecyclerView.ViewHolder> exten
     @Override
     final public VH onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = onPrepareViewHolder(parent, viewType);
-        View container = wrapItemView(v, mLabels, mColors);
+        View container = wrapItemView(v, viewType);
         return onCreateViewHolder(container);
     }
 }

@@ -9,7 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import adapter.SwipeItemImpl;
+import adapter.SwipeMenuItemImpl;
 import learn.android.ghostish.swipetoshowrecyclerview.SwipeToShowRecyclerView;
 
 /**
@@ -22,11 +22,11 @@ public class RecyclerSwipeTestActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recycler_view);
         final SwipeToShowRecyclerView rv = (SwipeToShowRecyclerView) findViewById(R.id.recycler_view);
-        List<SwipeItemImpl.Bean> data = new ArrayList<>();
+        List<SwipeMenuItemImpl.Bean> data = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
-            data.add(new SwipeItemImpl.Bean(String.valueOf(i), true));
+            data.add(new SwipeMenuItemImpl.Bean(String.valueOf(i), true));
         }
-        SwipeItemImpl adapter = new SwipeItemImpl(this, rv, data, new int[]{Color.parseColor("#FFFF8C40"), Color.parseColor("#FFB7B2B4"), Color.RED}, new String[]{"Top", "Mark as Unread", "Delete"});
+        SwipeMenuItemImpl adapter = new SwipeMenuItemImpl(this, rv, data);
         rv.setLayoutManager(new LinearLayoutManager(this));
         rv.setHasFixedSize(true);
         rv.setAdapter(adapter);
