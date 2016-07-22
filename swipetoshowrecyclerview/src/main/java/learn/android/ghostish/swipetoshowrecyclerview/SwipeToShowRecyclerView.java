@@ -7,6 +7,7 @@ import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -89,20 +90,15 @@ public class SwipeToShowRecyclerView extends RecyclerView {
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
-        if (isItemDragging) {
-            Log.d("ACTION", "touch consumed");
-            return true;
-        }
+
         return super.onTouchEvent(e);
     }
 
 
     @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (ev.getAction() == MotionEvent.ACTION_UP && discardAllTouchEvent) {
-            discardAllTouchEvent = false;
-        }
-        if (discardAllTouchEvent) {
+    public boolean dispatchTouchEvent(final MotionEvent ev) {
+
+        if (discardAllTouchEvent && ev.getAction() != MotionEvent.ACTION_DOWN) {
             return true;
         }
         int x = (int) ev.getX();
@@ -111,6 +107,7 @@ public class SwipeToShowRecyclerView extends RecyclerView {
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 Log.d("ACTION", "DOWN");
+                discardAllTouchEvent = false;
                 if (lastTouchView != null && lastTouchView.getScrollX() == MAX_LENGTH) {
                     Rect frame = new Rect();
                     lastTouchView.getHitRect(frame);
@@ -123,6 +120,31 @@ public class SwipeToShowRecyclerView extends RecyclerView {
                     }
                 }
                 lastTouchView = getChildAtPoint(x, y);
+                if (lastTouchView !=null) {
+                    lastTouchView.setOnTouchListener(new OnTouchListener() {
+                        @Override
+                        public boolean onTouch(View view, MotionEvent motionEvent) {
+                            switch (motionEvent.getAction()) {
+                                case MotionEvent.ACTION_DOWN:
+                                    Log.d("ACTION", "CHILD " + "DOWN");
+                                    break;
+                                case MotionEvent.ACTION_MOVE:
+                                    Log.d("ACTION", "CHILD " + "MOVE");
+                                    break;
+                                case MotionEvent.ACTION_CANCEL:
+                                    Log.d("ACTION", "CHILD " + "CANCEL");
+                                    break;
+                                case MotionEvent.ACTION_UP:
+                                    Log.d("ACTION", "CHILD " + "UP");
+                                    break;
+                                default:
+                                    Log.d("ACTION", "CHILD " + "ELSE");
+                                    break;
+                            }
+                            return lastTouchView.onTouchEvent(ev);
+                        }
+                    });
+                }
                 break;
             case MotionEvent.ACTION_MOVE:
                 Log.d("ACTION", "MOVE");
@@ -152,7 +174,7 @@ public class SwipeToShowRecyclerView extends RecyclerView {
                 break;
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
-                Log.d("ACTION", "DOWN");
+                Log.d("ACTION", "UP");
 
                 if (lastTouchView != null && !isViewAnimating && isItemDragging) {
                     SwipeMenuItemAdapter adapter = (SwipeMenuItemAdapter) getAdapter();
@@ -173,7 +195,10 @@ public class SwipeToShowRecyclerView extends RecyclerView {
         }
         mLastX = x;
         mLastY = y;
-
+        if ((isItemDragging || isViewAnimating) && lastTouchView != null) {
+            ev.setAction(MotionEvent.ACTION_CANCEL);
+            return lastTouchView.dispatchTouchEvent(ev);
+        }
         return super.dispatchTouchEvent(ev);
     }
 

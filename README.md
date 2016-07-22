@@ -6,7 +6,8 @@ An Android Library to add a hidden menu for each item in a [RecyclerView](https:
 <img src='./screenshot/demo.gif' height="600px"/>
 
 [ ![Download](https://api.bintray.com/packages/ghostish/maven/SwipeToShowRecyclerView/images/download.svg) ](https://bintray.com/ghostish/maven/SwipeToShowRecyclerView/_latestVersion)
-# Feature
+
+# Features
 
 1. support mutliple menu items
 2. support binding different menu to each itemview according to its viewtype
@@ -25,7 +26,7 @@ An Android Library to add a hidden menu for each item in a [RecyclerView](https:
 2. extends `SwipeMenuItemAdapter` as your RecyclerView adapter, overide its method as usual 
 (eg: onBindViewHolder(), getItemCount() ... etc)
 
-3. overide method the following methods:
+3. overide the following methods:
 
         /*you must return your itemview according to the given viewtype in this method*/
         publc View onPrepareViewHolder(ViewGroup parent, int viewType);
