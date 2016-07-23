@@ -1,4 +1,4 @@
-# SwipeToShowRecyclerView
+# SwipeToShowRecyclerView / SwipeMenuRecyclerView
 
 An Android Library to add a hidden menu for each item in a [RecyclerView](https://developer.android.com/reference/android/support/v7/recyclerview/package-summary.html)
 
@@ -46,7 +46,7 @@ An Android Library to add a hidden menu for each item in a [RecyclerView](https:
 as its Adapter, and set up the LinearLayoutManager
 
 # Simple Examples:
-
+```java
         public class SwipeMenuItemImpl extends SwipeMenuItemAdapter<SwipeMenuItemImpl.ViewHolder> {
         private List<Bean> mData;
         private static final int TYPE_TOP = 11;
@@ -105,9 +105,9 @@ as its Adapter, and set up the LinearLayoutManager
         
         ......
     }
-
+```
  --------------------------------------
-
+```java
      Acticity code: 
      protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,7 +123,7 @@ as its Adapter, and set up the LinearLayoutManager
         rv.setAdapter(adapter);
     }
 
-
+```
 
 # License
 
